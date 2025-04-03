@@ -28,10 +28,11 @@ class BinaryLabelDataset(StructuredDataset):
             ValueError: `favorable_label` and `unfavorable_label` must be the
                 only values present in `labels`.
         """
+        
         # fix scores before validating
         if np.all(self.scores == self.labels):
             self.scores = (self.scores == self.favorable_label).astype(np.float64)
-
+            
         super(BinaryLabelDataset, self).validate_dataset()
 
         # =========================== SHAPE CHECKING ===========================

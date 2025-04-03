@@ -80,29 +80,31 @@ class StandardDataset(BinaryLabelDataset):
                 `None`, no extra preprocessing is applied.
             metadata (optional): Additional metadata to append.
         """
+        
         # 2. Perform dataset-specific preprocessing
         if custom_preprocessing:
             df = custom_preprocessing(df)
 
+
         # 3. Drop unrequested columns
-        features_to_keep = features_to_keep or df.columns.tolist()
-        keep = (set(features_to_keep) | set(protected_attribute_names)
-              | set(categorical_features) | set([label_name]))
-        if instance_weights_name:
-            keep |= set([instance_weights_name])
-        df = df[sorted(keep - set(features_to_drop), key=df.columns.get_loc)]
-        categorical_features = sorted(set(categorical_features) - set(features_to_drop), key=df.columns.get_loc)
+#         features_to_keep = features_to_keep or df.columns.tolist()
+#         keep = (set(features_to_keep) | set(protected_attribute_names)
+#               | set(categorical_features) | set([label_name]))
+#         if instance_weights_name:
+#             keep |= set([instance_weights_name])
+#         df = df[sorted(keep - set(features_to_drop), key=df.columns.get_loc)]
+#         categorical_features = sorted(set(categorical_features) - set(features_to_drop), key=df.columns.get_loc)
 
-        # 4. Remove any rows that have missing data.
-        dropped = df.dropna()
-        count = df.shape[0] - dropped.shape[0]
-        if count > 0:
-            warning("Missing Data: {} rows removed from {}.".format(count,
-                    type(self).__name__))
-        df = dropped
+#         # 4. Remove any rows that have missing data.
+#         dropped = df.dropna()
+#         count = df.shape[0] - dropped.shape[0]
+#         if count > 0:
+#             warning("Missing Data: {} rows removed from {}.".format(count,
+#                     type(self).__name__))
+#         df = dropped
 
-        # 5. Create a one-hot encoding of the categorical variables.
-        df = pd.get_dummies(df, columns=categorical_features, prefix_sep='=')
+#         # 5. Create a one-hot encoding of the categorical variables.
+#         df = pd.get_dummies(df, columns=categorical_features, prefix_sep='=')
 
         # 6. Map protected attributes to privileged/unprivileged
         privileged_protected_attributes = []
@@ -142,6 +144,8 @@ class StandardDataset(BinaryLabelDataset):
                                                       df[label_name].to_numpy()))
             df.loc[pos, label_name] = favorable_label
             df.loc[~pos, label_name] = unfavorable_label
+            
+        print('standard dataset: is na?', df.isna().any().any())
 
         super(StandardDataset, self).__init__(df=df, label_names=[label_name],
             protected_attribute_names=protected_attribute_names,
